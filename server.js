@@ -12,6 +12,7 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var request = require('request');
+var db = require('./database.js')
 
 
 const port = 55555;
@@ -34,26 +35,31 @@ const batch1 = '/stock/aapl/chart/date/20180427/chartInterval/10'
 const socket_data = 'https://ws-api.iextrading.com/1.0'
 
 
-function get(req){
+function get(req, cb){
   request(api_prefix + req, function (error, response, body) {
-    logger.log('error:', error); // Print the error if one occurred
-    logger.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-    logger.log('body:', body); // Print the HTML for the Google homepage.
+    //logger.log('error:', error); // Print the error if one occurred
+    //logger.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+    //logger.log('body:', body); // Print the HTML for the Google homepage.
+    logger.log(body)
+    cb(body)
+
   });
 }
 
 
 
-// write_to_file('/stock/fb/chart/1m', '/fb_1m.js')
+// write_to_file('/stock/aapl/chart/date/20180501', '/aapl_minutly_1month.js')
 
 
 //creates full symbol list, only run once or as needed
 // write_to_file('/ref-data/symbols', './symbol_list.js')
 function write_to_file(api, file_name){
-  request(api_prefix + api).pipe(fs.createWriteStream('./stock_data'+file_name))
+  request(api_prefix + api).pipe(fs.createWriteStream('./price_data/'+file_name+'.json').on('error', (err)=>{
+    logger.log(err)
+  }))
 }
 
-find_highs_and_lows(require('./stock_data/fb_5y.js'))
+// find_highs_and_lows(require('./stock_data/fb_5y.js'))
 function find_highs_and_lows(data){
   logger.log(data.length)
   const pivot_array = [data[0].low]
@@ -70,6 +76,7 @@ function find_highs_and_lows(data){
   var difference = 0;
 
   data.forEach(point => {
+
     //lower low -> this is going down
     if (point.low < prev_low_value) {
       logger.log('lower low')
@@ -122,11 +129,11 @@ function find_highs_and_lows(data){
     }
   });
   logger.log({
-    side_counter,
     pivot_array,
     high_low_obj,
     high,
     low,
+    side_counter,
     prev_low_value,
     prev_high_value,
     lower_low_count,
@@ -136,3 +143,75 @@ function find_highs_and_lows(data){
   })
 
 }
+
+
+var list = `"F","S","T","NVT","MDR","MPC","X","TEVA","VZ","ARNC","RIG","NBR","AUY","OAS","I","WFC","XOM","MRK","SWN","NOK","WFT","EGO","ABBV","JCP","KO","C","GM","THC","MGM","FDC","CBI","CLF","ESV","MRO","BABA","KR","JPM","UA","HPE","BSX","NWL","PBR","KGC","CTL","CVS","RF","DNR","ORCL","CX","MS","JCI","M","HPQ","PG","KEY","ANDV","ABEV","GGP","SQ","WLL","DHX","ABX","BP","WU","SHOP","GG","CLNS","CFG","DWDP","COP","NLY","WMT","MTG","NLSN","DAL","VER","DIS","WY","MCD","CVX","AZN","MAS","V","NVCN","EEM","SPY","BAC","XLF","GE","PFE","AAPL","AMD","TVIX","CHK","QQQ","SNAP","GDX","MU","AKS","MSFT","TWTR","INTC","FB","FXI","CMCSA","VXX","IWM","HTBX","XLI","UVXY","MTCH","XOP","FCX","HYG","TPR","ECA","EFA","VWO","CSCO","HBI","VALE","UAA","STX","IAU","RIG","COMM","SLV","EWZ","SQQQ","XLE","EXC","XOM","MRK","CZR","TMUS","AMLP","CGNX","SIRI","XLU","AMAT","XLP","FLEX","KN","JD","KMI","GDXJ","ON","BMY"`
+
+// var list = `
+// "F","BAC","GE","PFE","S","CHK","T","SNAP","AKS","TWTR"`
+// var list = `
+// "F","GE"`
+
+
+// list.split(',').forEach((symbol)=>{
+//   // console.log(symbol.trim())
+//   db.insert_if_not_exist('stocks_list', { name: symbol.trim().split('"')[1], daily_data:[], minutly_data:[] }, (resp) => {
+//     // logger.log(resp)
+//   })
+// })
+
+
+
+var list = list.split(',')
+var list_counter = list.length
+function get_this(count){
+  if (count >= list_counter) return
+  console.log('go?')
+  setTimeout(()=>{
+
+    let symbol = list[count].split('"')[1]
+    let str_symol = list[count]
+    var x = 0
+    var cap = 0
+
+    get_that(str_symol, x, cap )
+    get_this(++count);
+
+  }, 3);//timer miliseconds
+
+}
+
+
+
+function get_that(sym, count, cap){
+  var t = 201804
+
+  if(count > cap ) return
+  setTimeout(()=> {
+
+  if (count < 10) count = '0' + count
+  let day = String(t) + String(count)
+    // let req = `/stock/${sym.split('"')[1]}/chart/date/${day}`
+    // let req = `/stock/${sym.split('"')[1]}/chart/date/${day}`
+    let req = `/stock/${sym.split('"')[1]}/price/`
+  // request_count.push(`/stock/${sym}/chart/date/${day}`)
+    console.log(req)
+    write_to_file(req, sym.split('"')[1]+day)
+    // get(req, (data)=>{
+    //   // push_data: (collectionName, data, name, daily_or_minutly, callback) => {
+
+    //   db.push_data("stocks_list", data, sym , 'minutly_data', (resp)=>{
+    //     if(!resp.err) logger.log('succes ')
+    //     logger.log(resp.message.result)
+    //   })
+    // })
+    get_that(sym, ++count, cap)
+  }, 300);
+}
+
+get_this(0);
+
+
+
+
+// 20180401
