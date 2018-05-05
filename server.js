@@ -3,22 +3,25 @@ var logger = require('tracer').colorConsole({
   format: "{{timestamp.green}} <{{title.yellow}}> {{message.cyan}} (in {{file.red}}:{{line}})",
   dateformat: "HH:MM:ss.L"
 })
-var fs = require('fs')
-// var symbol_list = require('./symbol_list.js')
+var symbol_list = require('./stock_data/symbol_list.js')
 
 var express = require('express');
 
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-var request = require('request');
 var db = require('./database.js')
+var file_handling = require('./file_handling.js')
 
 
 const port = 55555;
 app.listen(port, ()=>{logger.log(`listening on ${port}`)})
-
-const api_prefix = 'https://api.iextrading.com/1.0'
+var options = {root: __dirname}
+app.get('/', (req, res)=>{
+  res.sendFile('./index.html', options, (err)=>{
+    if(err)logger.log(err)
+  })
+})
 
 const symbol_example = '?symbols=SNAP,fb'
 
@@ -31,33 +34,20 @@ const filter_example = '?filter=symbol,volume,lastSalePrice'
 // const batch1 = '/stock/market/batch?symbols=aapl,fb,tsla&types=quote,news,chart&range=1m&last=5'
 const batch1 = '/stock/aapl/chart/date/20180427/chartInterval/10'
 // const batch1 = '/deep/official-price?symbols=appl'
-// get(batch1)
+// data_fetch.get(batch1)
 const socket_data = 'https://ws-api.iextrading.com/1.0'
-
-
-function get(req, cb){
-  request(api_prefix + req, function (error, response, body) {
-    //logger.log('error:', error); // Print the error if one occurred
-    //logger.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-    //logger.log('body:', body); // Print the HTML for the Google homepage.
-    logger.log(body)
-    cb(body)
-
-  });
-}
-
-
-
-// write_to_file('/stock/aapl/chart/date/20180501', '/aapl_minutly_1month.js')
+const DM = require('./data_models.js')
+const data_fetch = require('./data_fetch.js')
 
 
 //creates full symbol list, only run once or as needed
-// write_to_file('/ref-data/symbols', './symbol_list.js')
-function write_to_file(api, file_name){
-  request(api_prefix + api).pipe(fs.createWriteStream('./price_data/'+file_name+'.json').on('error', (err)=>{
-    logger.log(err)
-  }))
-}
+// req_and_write_to_file('/ref-data/symbols', 'stock_data', './symbol_list')
+var options = { encoding: 'utf16le', flags: 'a' };
+//@@@@@@@@  THIS MAYBE A FINAL VERSION OF DAILY RAN FUNCTION
+//TODO verify date of data is correct, compare against the filename??
+//req_and_write_to_file('/stock/market/previous', './all_symbols_previous_data/', '20180503')
+//@@@@@@@@
+
 
 // find_highs_and_lows(require('./stock_data/fb_5y.js'))
 function find_highs_and_lows(data){
@@ -144,74 +134,118 @@ function find_highs_and_lows(data){
 
 }
 
+function get_monthly_data_and_save_to_file(){
+  // console.log(list_of_symbols_by_volume)
+  data_fetch.init_get_monthly_data_loop('201805', 1, 3)//1, 3 last ran // next 4, 4? or 3, 4? just need one tomorrow
+}
 
-var list = `"F","S","T","NVT","MDR","MPC","X","TEVA","VZ","ARNC","RIG","NBR","AUY","OAS","I","WFC","XOM","MRK","SWN","NOK","WFT","EGO","ABBV","JCP","KO","C","GM","THC","MGM","FDC","CBI","CLF","ESV","MRO","BABA","KR","JPM","UA","HPE","BSX","NWL","PBR","KGC","CTL","CVS","RF","DNR","ORCL","CX","MS","JCI","M","HPQ","PG","KEY","ANDV","ABEV","GGP","SQ","WLL","DHX","ABX","BP","WU","SHOP","GG","CLNS","CFG","DWDP","COP","NLY","WMT","MTG","NLSN","DAL","VER","DIS","WY","MCD","CVX","AZN","MAS","V","NVCN","EEM","SPY","BAC","XLF","GE","PFE","AAPL","AMD","TVIX","CHK","QQQ","SNAP","GDX","MU","AKS","MSFT","TWTR","INTC","FB","FXI","CMCSA","VXX","IWM","HTBX","XLI","UVXY","MTCH","XOP","FCX","HYG","TPR","ECA","EFA","VWO","CSCO","HBI","VALE","UAA","STX","IAU","RIG","COMM","SLV","EWZ","SQQQ","XLE","EXC","XOM","MRK","CZR","TMUS","AMLP","CGNX","SIRI","XLU","AMAT","XLP","FLEX","KN","JD","KMI","GDXJ","ON","BMY"`
+function get_5y_historical_data(start, end){
+  logger.log({ start, end })
+  if (start >= end) return
+  setTimeout(() => {
 
-// var list = `
-// "F","BAC","GE","PFE","S","CHK","T","SNAP","AKS","TWTR"`
-// var list = `
-// "F","GE"`
+    DM.top_volume_list(end, (result_array) => {
+      const ticker = result_array[start]
+      logger.log(result_array.length)
+      logger.log(ticker)
+      data_fetch.get_5y_historical_data(ticker, (data) => {
+        // DM.insert_historical_data(data, ticker)//insert to DB
+        //OR
+        file_handling.create_file_with_data(`./historical_data/${ticker}.json`, data, (resp)=>{
+          logger.log(resp)
+        })//Lets save to file
+
+      })
+    })
+    get_5y_historical_data(++start, end)
+
+  }, 50)
+}
+
+function get_main_stocks_previous_data(start, count){
+  logger.log({start, count})
+  if (start >= count) return
+  setTimeout(() => {
+
+  DM.top_volume_list(count, (result_array)=>{
+    logger.log(result_array.length)
+      logger.log(result_array[start])
+      data_fetch.get_end_of_day_data(result_array[start], (data)=>{
+        DM.push_previous_data(data)
+
+      })
+  })
+    get_main_stocks_previous_data(++start, count)
+
+  }, 50)
+
+  
+}
+
+function update_book_durring_day(count){
+  //try watching 200 stocks every 20 seconds?
+  logger.log(count.length)
+  data_fetch.init_intraday_watch(count)
+}
+// update_book_durring_day(100)
+
+//test
+// get_monthly_data_and_save_to_file()//runs init get monthly data loop that i hopt to never to again
+// data_fetch.test_get_end_of_day_data('FB')//will fetch and insert for given ticker symbol
+// DM.pop_previous_data("SNAP")//removes the last element of an array in given ticker symbol
+// DM.add_daily_data()//this loops through a file full of all ticker symbols and their data
+// get_main_stocks_previous_data(0, 1000) //this will get previous days data NEED to MAKE SURE, not to fuck it up
+// get_5y_historical_data(0, 100)//ran with 0, 100
+// db.add_empty_array_field('main_liquid_stocks_followed', 'intra')
 
 
-// list.split(',').forEach((symbol)=>{
-//   // console.log(symbol.trim())
-//   db.insert_if_not_exist('stocks_list', { name: symbol.trim().split('"')[1], daily_data:[], minutly_data:[] }, (resp) => {
-//     // logger.log(resp)
-//   })
+//these steps make the initial database, name:name, historical:[data], minutly:[data], intra:[]
+const test_data = ['AAPL', "FB", "MSFT", "AMZN"]
+//step 1.
+// DM.create_list_in_db(4)
+//step2. add historical data
+// db.add_empty_array_field('main_liquid_stocks_followed_test', 'historical')
+//set historical to the file we have
+
+file_handling.read_file('./historical_data/SNAP.json', (history_array)=>{
+  logger.log('test')
+  logger.log(history_array)
+  db.set_historical_data_from_file('main_liquid_stocks_followed_test', 'historical', history_array, "SNAP") 
+
+})
+// get_5y_historical_data(0, 4)//test array has  (['FB', "AAPL", "MSFT", "AMZN"])
+
+//step 3. add minutly data
+
+//step 4 add intra array
+// db.add_empty_array_field('main_liquid_stocks_followed_test', 'intra')
+
+
+//test create array, and then push
+// const fake_history_array = [1, 2, 3, 45, 55, 554,43,234, 22]
+// test_data.forEach((i)=>{
+//   DM.insert_historical_data(fake_history_array, i)
+
 // })
 
+//now push data to array 
+// DM.add_daily_data(1)
 
+// db.upsert_into_array('main_liquid_stocks_followed_test' , {'historical':{
+//   "symbol": "SNAP",
+//   "date": "2018-05-04",
+//   "open": 11.3,
+//   "high": 11.7,
+//   "low": 10.96,
+//   "close": 11.03,
+//   "volume": 159209399,
+//   "unadjustedVolume": 159209399,
+//   "change": -3.1,
+//   "changePercent": -21.939,
+//   "vwap": 11.2531
+// }},{name:"SNAP"})
 
-var list = list.split(',')
-var list_counter = list.length
-function get_this(count){
-  if (count >= list_counter) return
-  console.log('go?')
-  setTimeout(()=>{
+// db.get_data_of_last_item_in_history('main_liquid_stocks_followed_test', "SNAP", (date)=>{
+//   logger.log(date)
+// })
 
-    let symbol = list[count].split('"')[1]
-    let str_symol = list[count]
-    var x = 0
-    var cap = 0
-
-    get_that(str_symol, x, cap )
-    get_this(++count);
-
-  }, 3);//timer miliseconds
-
-}
-
-
-
-function get_that(sym, count, cap){
-  var t = 201804
-
-  if(count > cap ) return
-  setTimeout(()=> {
-
-  if (count < 10) count = '0' + count
-  let day = String(t) + String(count)
-    // let req = `/stock/${sym.split('"')[1]}/chart/date/${day}`
-    // let req = `/stock/${sym.split('"')[1]}/chart/date/${day}`
-    let req = `/stock/${sym.split('"')[1]}/price/`
-  // request_count.push(`/stock/${sym}/chart/date/${day}`)
-    console.log(req)
-    write_to_file(req, sym.split('"')[1]+day)
-    // get(req, (data)=>{
-    //   // push_data: (collectionName, data, name, daily_or_minutly, callback) => {
-
-    //   db.push_data("stocks_list", data, sym , 'minutly_data', (resp)=>{
-    //     if(!resp.err) logger.log('succes ')
-    //     logger.log(resp.message.result)
-    //   })
-    // })
-    get_that(sym, ++count, cap)
-  }, 300);
-}
-
-get_this(0);
-
-
-
-
-// 20180401
