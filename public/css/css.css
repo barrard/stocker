@@ -1,0 +1,9 @@
+body{
+  background:rgba(111, 111, 111, 0.5);
+}
+
+canvas{
+  border: 1px solid black;
+   height: 500px;
+  width:500px; 
+}

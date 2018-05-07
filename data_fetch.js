@@ -8,7 +8,7 @@ const fs = require('fs')
 
 const utils = require('./utils.js');
 const DM = require('./data_models.js')
-const db = require('./database.js')
+const Stock_model = require('./stock_model.js')
 
 const api_prefix = 'https://api.iextrading.com/1.0'
 const daily_symbol_quotes = 'daily_symbol_quotes_new'
@@ -41,26 +41,7 @@ module.exports = {
       }
     })
   },
-  get_end_of_day_data: (symbol, callback) => {
-    var req = `/stock/${symbol}/previous`
-    module.exports.get(req, (body) => {
-      logger.log(body)
-      if (!body) return
-      try {
-        const data = JSON.parse(body)
-        logger.log(data)
-
-        callback(data)
-      } catch (e) {
-        logger.log('Some kind JSON error')
-        logger.log(e)
-      }
-    })
-  },
-  get_all_end_of_day_data:()=>{
-    logger.log('hi')
-  },
-
+  
   req_and_write_to_file:(api, filename, append_export)=>{
     // module.exports.get(api, (resp)=>{
     //   console.log(resp)
@@ -110,8 +91,8 @@ module.exports = {
     }, 2000);//timer miliseconds
 
   },
-  get_previous: (list, start, end, cb) => {
-    logger.log({start, end})
+  get_previous_daily: (list, start, end, cb) => {
+    logger.log({ start, end })
     const length = list.length
     // logger.log(list)
     if (start >= end) return
@@ -127,9 +108,31 @@ module.exports = {
         // DM.push_intra_data(body)
       })
 
-      module.exports.get_previous(list, ++start, end, cb)
+      module.exports.get_previous_daily(list, ++start, end, cb)
 
     }, 200);//timer miliseconds
+
+  },
+
+  get_previous_minutely: (list, start, end, cb) => {
+    logger.log({ start, end })
+    const length = list.length
+    // logger.log(list)
+    if (start >= end) return
+    setTimeout(() => {
+      let sym = list[start]
+      let req = `/stock/${sym}/chart/date/20180504`
+      // logger.log(req)
+      logger.log(sym)
+      module.exports.get(req, (body) => {
+        // logger.log(body)
+        cb(body, sym)
+        // DM.push_intra_data(body)
+      })
+
+      module.exports.get_previous_minutely(list, ++start, end, cb)
+
+    }, 50);//timer miliseconds
 
   },
 
@@ -169,7 +172,7 @@ module.exports = {
       // data_fetch.get(req, (data)=>{
       //   // push_data: (collectionName, data, name, daily_or_minutly, callback) => {
 
-      //   db.push_data("stocks_list", data, sym , 'minutly_data', (resp)=>{
+      //   Stock_model.push_data("stocks_list", data, sym , 'minutly_data', (resp)=>{
       //     if(!resp.err) logger.log('succes ')
       //     logger.log(resp.message.result)
       //   })
