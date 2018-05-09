@@ -50,7 +50,7 @@ module.exports = (app)=>{
 
 
 
-  app.get('/', (req, res) => {
+  app.get('/stocker', (req, res) => {
     logger.log('APPPPP')
     res.sendFile(`${__dirname}/index.html`, (err) => {
       if (err) logger.log(err)
