@@ -14,12 +14,7 @@ get_chart_btn.addEventListener('click', (e)=>{
   var count = document.getElementById('number_input').value
   get_chart(symbol, count, time_frame, (data) => {
     console.log(data)
-    // const max = data.reduce(function (prev, current) {
-    //   return (prev.high > current.high) ? prev.high : current.high
-    // })
-    // const min = data.reduce(function (prev, current) {
-    //   return (prev.low < current.low) ? prev.low : current.low
-    // })
+
     var max_min = ()=>{
       var max = 0       //low number that is lower than any high
       var min = 10000000 //some big number that is larger than any lows
@@ -35,7 +30,8 @@ get_chart_btn.addEventListener('click', (e)=>{
       return {max, min}
     }
     var candle_width = Main_data.canvas_data[0].candle_width
-    draw_chart(max_min(), data, canvas, candle_width)
+    var space_between_bars = Main_data.canvas_data[0].space_between_bars
+    draw_chart(max_min(), data, canvas, candle_width, space_between_bars)
 
     console.log(max_min())
     // console.log(max)

@@ -5,10 +5,16 @@ body{
 canvas{
   border: 1px solid black;
    height: 500px;
-  width:500px; 
+  /* width:500px;  */
 }
 
 .canvas-wrapper{
-  width: 500px;
+  width: 90%;
   overflow-x: scroll;
+}
+
+#MindFusionChart{
+  position: absolute;
+  top: 100px;
+  border: 1px solid green;
 }

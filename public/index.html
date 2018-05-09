@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <link rel="stylesheet" href="css/css.css">
+  <link rel="stylesheet" href="/stocker/css/css.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -18,22 +18,29 @@
   <input type="radio" name="time-frame" value="historical">
   <!-- <input type="radio" name="time-frame" id="minute"> -->
   <button id="get_chart_btn">Get Chart</button>
+<!-- <div id="MindFusionChart">
+  <canvas id="MindFusionCanvas" height="800px" width="1000"></canvas>
+</div> -->
+
 
   <div class="canvas-wrapper">
-    <canvas id="myCanvas" height="500"></canvas>
+    <canvas id="myCanvas"width="1000" height="800"></canvas>
 
   </div>
   <br>
   <hr> Candle Stick width(px)
   <div style="display:inline" id="candle_stick_width_range_input_value"></div style="display:inline">
-  <input max="20" min="0" step="1" value='0' type="range" id='candle_stick_width_range_input'>
+  <input max="20" min="3" step="1" value='3' type="range" id='candle_stick_width_range_input'>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/UI.js"></script>
+  <!-- <script src="/stocker/js/libs/MindFusion/MindFusion.Common.js"></script>
+    <script src="/stocker/js/libs/MindFusion/MindFusion.Gauges.js"></script>
+  <script src="/stocker/js/libs/MindFusion/MindFusion.Charting.js"></script> -->
+  <script src="/stocker/js/data.js"></script>
+  <script src="/stocker/js/UI.js"></script>
 
-  <script src="js/requesting_data.js"></script>
-  <script src="js/js.js"></script>
+  <script src="/stocker/js/requesting_data.js"></script>
+  <script src="/stocker/js/js.js"></script>
 
 </body>
 

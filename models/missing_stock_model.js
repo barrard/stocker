@@ -8,13 +8,12 @@ var logger = require('tracer').colorConsole({
 // var url = 'mongodb://localhost:27017';
 
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/stocker_mongoose');
-var db = mongoose.connection;
+// mongoose.connect('mongodb://localhost/stocker_mongoose');
+// var db = mongoose.connection;
 var Schema = mongoose.Schema;
 
-db.on('error', console.error.bind(console, 'connection error:'));
+// db.on('error', console.error.bind(console, 'connection error:'));
 // db.once('open', function () {
-logger.log('mogoose ready')
 
 
 var missing_stock_schema = new Schema({

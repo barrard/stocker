@@ -3,6 +3,7 @@ var context = canvas.getContext('2d');
 var canvas_height_manual_setting = false
 // canvas.width = window.innerWidth
 console.log(canvas.width)
+console.log(canvas.height)
 // context.beginPath();
 // context.rect(188, 50, 200, 100);
 // context.fillStyle = 'yellow';
@@ -54,38 +55,58 @@ candle_stick_width_range_input.addEventListener('input', () => {
   if(value > 9){hidden_span.style.display = "none"
           }else{hidden_span.style.display = "inline"}
   //redraw the chart with bigger candle sticks, 
-  get_chart_btn.click('custon data')
+  get_chart_btn.click()
 
 
-
-
-  
 
 })
 
 // candle_stick_width_range_input.addEventListener('onchange', () => {
 //   console.log('dfgdfgdfgdfg')
 // })
-function draw_chart(min_max, data, canvas, candle_width) {
+function draw_chart(min_max, data, canvas, candle_width, space_between_bars) {
+  var context = canvas.getContext('2d');
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  // context.lineWidth = 3;
+  // context.strokeStyle = 'black';
+  console.log({ min_max })
+  canvas.width = data.length * candle_width + (space_between_bars*data.length)
+
   console.log(`Candle_width arg = ${candle_width}`)
-  if (!canvas_height_manual_setting) canvas.height = min_max.max - min_max.min
-  if (!candle_width){candle_width = 3}
-  canvas.width = data.length * candle_width
+  // if (!canvas_height_manual_setting) canvas.height = (min_max.max - min_max.min) * 10
+  if (!candle_width){
+    candle_width = canvas.width/data.length
+    }
+
+  if (!space_between_bars){
+    space_between_bars=0
+  }
+
 
   console.log(`Candle width = ${candle_width}`)
   data.forEach((data, count)=>{
-    draw_candle(count*candle_width, min_max, data, candle_width)
+    const candle_position = (count * candle_width) + space_between_bars
+    draw_candle(candle_position, min_max, data, candle_width)
   })  
 }
 
 // draw_candle(1, 100, 0, {low:0, high:80, open:75, close:80})
 function draw_candle(candle_position, min_max, candle_data, candle_width){
-  // console.log(candle_data)
-  var high = min_max.max
-  var low = min_max.min
+  var number_of_pennies = (min_max.max - min_max.min) * 100
+  var pennies_per_pixel = (number_of_pennies / canvas.height)
+  var pixels_per_penny = (canvas.height / number_of_pennies)
+  // console.log({ pennies_per_pixel })
+  // console.log({ pixels_per_penny })
+
+const total_range_in_pennies = canvas.height*pennies_per_pixel
+// console.log({total_range_in_pennies})
+  // console.log({ candle_data})
+  // console.log((min_max.max - candle_data.high) * 100 * pixels_per_penny)
+  // console.log((min_max.max - candle_data.low) * 100 * pixels_per_penny)
+  // console.log(candle_position + (candle_width / 2))
   context.beginPath();
-  context.moveTo(candle_position+(candle_width/2), high-candle_data.high);
-  context.lineTo(candle_position + (candle_width/2), high - candle_data.low);
+  context.moveTo(candle_position + (candle_width / 2), (min_max.max-candle_data.high)*100*pixels_per_penny);
+  context.lineTo(candle_position + (candle_width / 2), (min_max.max - candle_data.low) * 100 * pixels_per_penny);
   context.stroke();
 
   //candle rect
@@ -93,18 +114,18 @@ function draw_candle(candle_position, min_max, candle_data, candle_width){
   if(candle_data.open > candle_data.close){
     // console.log('red')
     context.fillStyle = 'red';
-    candle_height = candle_data.open - candle_data.close
+    candle_height = (candle_data.open - candle_data.close)*100*pixels_per_penny
   }else if(candle_data.open == candle_data.close){
     // console.log('black')
     context.fillStyle = 'black';
-    candle_height = 1
+    candle_height = 10
 
   }else{
     // console.log('green')
     context.fillStyle = 'green';
-    candle_height = candle_data.close - candle_data.open
+    candle_height = (candle_data.close - candle_data.open)*100*pixels_per_penny
   }
-  context.fillRect((candle_position + (candle_width/2)) - (candle_width / 2),  high - candle_data.open,
+  context.fillRect((candle_position + (candle_width / 2)) - (candle_width / 2), (min_max.max - candle_data.open) * 100 * pixels_per_penny,
                     candle_width, candle_height)
   //open line 
   // context.moveTo((candle_position + (candle_width/2))-(candle_width/2), high - candle_data.open);

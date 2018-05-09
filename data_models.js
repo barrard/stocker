@@ -5,7 +5,7 @@ var logger = require('tracer').colorConsole({
 })
 const fs = require('fs')
 const Stock_model = require('./stock_model.js')
-const serv = require('./server.js')
+// const serv = require('./server.js')
 const data_fetch = require('./data_fetch')
 const utils = require('./utils.js');
 
@@ -40,18 +40,19 @@ module.exports = {
   },
     //Main function for keeping historical data up to date
   add_daily_data: (count) => {
-    Stock_model.findOne({}, {'historical.date':1}, (err, resp)=>{
-      if(err)return
+    logger.log('ADD DAILY DATA')
+    Stock_model.findOne({}, { 'historical.date': 1 }, (err, resp) => {
+      if (err) return
       var resp = resp.historical
       var last = resp[resp.length - 1].date
 
       var last_date = utils.date_parser(last)
       logger.log(`The last date is ${last_date}`)
       var my_time = new Date()
-      if (my_time.getDay() == 0 || my_time.getDay() == 6 ){         //Make sure its not the weekend
+      if (my_time.getDay() == 0 || my_time.getDay() == 6) {         //Make sure its not the weekend
         logger.log('ITS THE FREAKIN WEEKEND!!')
-        logger.log(my_time.getDay())  
-      }else{                                                        //make sure you dont already have the data
+        logger.log(my_time.getDay())
+      } else {                                                        //make sure you dont already have the data
         var my_date = my_time.getDate()                             //by hecking the date in db and current
         logger.log(`my current new date is ${my_time.getDate()}`)
         if (my_date === last_date) {
@@ -63,19 +64,23 @@ module.exports = {
             data = JSON.parse(data)
             // logger.log(data)
 
-          utils.check_available_data_is_new(my_date, data.date)
+            if (!utils.check_available_data_is_new(my_date, data.date)) {
+              logger.log('The website hasnt updated its data yet')
+            } else {
+              module.exports.top_volume_list(count, (list) => {
+                const length = list.length
+                logger.log({ list, length })
+                //list, start, end,   cb
+                data_fetch.get_previous_daily(list, 0, count, (data) => {
+                  data = JSON.parse(data)
+                  Stock_model.update({ name: data.symbol }, { $push: { historical: data } }, (e) => {
+                    if (e) logger.log(e)
+                  })
+                })
+              })
+            }
 
-          // module.exports.top_volume_list(count, (list) => {
-          //   const length = list.length
-          //   logger.log({ list, length })
-          //                             //list, start, end,   cb
-          //   data_fetch.get_previous_daily(list, 0, count, (data) => {
-          //     data = JSON.parse(data)
-          //     Stock_model.update({ name: data.symbol }, { $push: { historical: data } }, (e) => {
-          //       if (e) logger.log(e)
-          //     })
-          //   })
-          // })
+
           })
 
         }
@@ -89,16 +94,16 @@ module.exports = {
     Stock_model.findOne({}, { 'minutely_data.date': 1 }, (err, resp) => {
       if (err) return
       // logger.log(resp)
-      var last_date = resp.minutely_data[resp.minutely_data.length-1].date
+      var last_date = resp.minutely_data[resp.minutely_data.length - 1].date
       last_date = utils.date_parser(last_date)
-      console.log(`The last date is ${last_date}`)
+      logger.log(`The last date in database  is ${last_date}`)
       var my_time = new Date()
       if (my_time.getDay() == 0 || my_time.getDay() == 6) {         //Make sure its not the weekend
         logger.log('ITS THE FREAKIN WEEKEND!!')
         logger.log(my_time.getDay())
       } else {                                                        //make sure you dont already have the data
         var my_date = my_time.getDate()                             //by hecking the date in db and current
-        console.log(`my current new date is ${my_time.getDate()}`)
+        logger.log(`my current date is ${my_date}`)
         if (my_date === last_date) {
           logger.log('No neeeeed')
         } else {
@@ -106,22 +111,26 @@ module.exports = {
           data_fetch.get_previous_minutely(['MSFT'], 0, 1, (data, symbol) => {
             data = JSON.parse(data)
 
-            utils.check_available_data_is_new(my_date, data[0].date)
+            if (!utils.check_available_data_is_new(my_date, data[0].date)) {
+              logger.log('WEBSITE HASNT UPDATED MINUTELY DATA YET')
+            } else {
+              module.exports.top_volume_list(count, (list) => {
+                const length = list.length
+                logger.log({ list, length })
+                //list, start, end, cb
+                data_fetch.get_previous_minutely(list, 0, count, (data, symbol) => {
+                  data = JSON.parse(data)
+                  // logger.log(data)                    
+                  Stock_model.update({ name: symbol }, { $push: { minutely_data: data } }, (e) => {
+                    if (e) logger.log(e)
+                  })
+                })
+              })
+            }
 
 
 
-          // module.exports.top_volume_list(count, (list) => {
-          //   const length = list.length
-          //   logger.log({ list, length })
-          //   //list, start, end, cb
-          //   data_fetch.get_previous_minutely(list, 0, count, (data, symbol) => {
-          //     data = JSON.parse(data)
-          //     // logger.log(data)                    
-          //     Stock_model.update({ name: symbol }, { $push: { minutely_data: data } }, (e) => {
-          //       if (e) logger.log(e)
-          //     })
-          //   })
-          // })
+
           })
 
         }
