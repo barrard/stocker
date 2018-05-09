@@ -3,7 +3,7 @@ var logger = require('tracer').colorConsole({
   format: "{{timestamp.green}} <{{title.yellow}}> {{message.cyan}} (in {{file.red}}:{{line}})",
   dateformat: "HH:MM:ss.L"
 })
-var symbol_list = require('./stock_data/symbol_list.js')
+// var symbol_list = require('./stock_data/symbol_list.js')
 
 var express = require('express');
 var cors = require('cors')

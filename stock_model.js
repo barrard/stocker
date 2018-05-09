@@ -3,9 +3,9 @@ var logger = require('tracer').colorConsole({
   format: "{{timestamp.green}} <{{title.yellow}}> {{message.cyan}} (in {{file.red}}:{{line}})",
   dateformat: "HH:MM:ss.L"
 })
-var MongoClient = require('mongodb').MongoClient
-var mongodb = require('mongodb')
-var url = 'mongodb://localhost:27017';
+// var MongoClient = require('mongodb').MongoClient
+// var mongodb = require('mongodb')
+// var url = 'mongodb://localhost:27017';
 var database_name = "stocker_mongoose"
 
 var mongoose = require('mongoose');
