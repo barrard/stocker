@@ -13,11 +13,12 @@
     "cors": "^2.8.4",
     "express": "^4.16.3",
     "jquery": "^3.3.1",
+    "mongoose": "3.8.39",
     "mongodb": "2.1.18",
-    "mongoose": "^5.0.17",
     "redis": "^2.8.0",
     "request": "^2.85.0",
     "socket.io": "^2.1.0",
     "tracer": "^0.8.12"
-  }
+  },
+  "testing": "mongoose\":\"^5.0.17"
 }
