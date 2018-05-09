@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <link rel="stylesheet" href="css/css.css">
   <meta charset="UTF-8">
@@ -7,23 +8,26 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Stocker</title>
 </head>
+
 <body>
-    <h1>Canvas</h1>
-     symbol:
-    <input id="symbol_input" type="text" value="SNAP">
-     number of bars:
-    <input id="number_input" type="number" value="3000">
-    minutely data
-    <input type="radio" name="time-frame" value="minutely_data">
-    historical data
-    <input type="radio" name="time-frame" value="historical">
-    <!-- <input type="radio" name="time-frame" id="minute"> -->
-    <button id="get_chart_btn">Get Chart</button>
+  <h1>Canvas</h1>
+  symbol:
+  <input id="symbol_input" type="text" value="SNAP"> number of bars:
+  <input id="number_input" type="number" value="3000"> minutely data
+  <input type="radio" name="time-frame" value="minutely_data"> historical data
+  <input type="radio" name="time-frame" value="historical">
+  <!-- <input type="radio" name="time-frame" id="minute"> -->
+  <button id="get_chart_btn">Get Chart</button>
 
+  <div class="canvas-wrapper">
+    <canvas id="myCanvas" height="500"></canvas>
 
-        <canvas id="myCanvas"  height="500"></canvas>
-        <button id=canvas_btn>Canvas height</button>
-    
+  </div>
+  <br>
+  <hr> Candle Stick width(px)
+  <div style="display:inline" id="candle_stick_width_range_input_value"></div style="display:inline">
+  <input max="20" min="0" step="1" value='0' type="range" id='candle_stick_width_range_input'>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
   <script src="js/data.js"></script>
   <script src="js/UI.js"></script>
@@ -32,4 +36,5 @@
   <script src="js/js.js"></script>
 
 </body>
+
 </html>

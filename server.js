@@ -97,12 +97,12 @@ function update_book_durring_day(count){
 
 
 //update historical and minutely data via the HTTP API calls
-//DM.add_daily_data(1000)//1000 is ok here   //@@ KEEP THIS A MINUTE    //files added up to 5/4
+// DM.add_daily_data(1000)//1000 is ok here   //@@ KEEP THIS A MINUTE    //files added up to 5/7
                 //TODO LATER
         //test that we dont add duplicates to mintely data
                     //OR                
   //AFTER above ran first
-//DM.add_minutely_data(500)//mo bettah  //run 1 OR the other     //this may become daily function
+// DM.add_minutely_data(500)//mo bettah  //run 1 OR the other     //this may become daily function
 
 
 

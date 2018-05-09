@@ -1,4 +1,5 @@
 --remove item form array
 db.stocks.update({}, {$pull:{minutely_data:{date:"2018-05-04"}}}, {multi:true})
 
+mongodump --db stocker_mongoose --out ./stocker_dump
 

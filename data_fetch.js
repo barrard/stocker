@@ -98,12 +98,11 @@ module.exports = {
     if (start >= end) return
     setTimeout(() => {
       let sym = list[start]
-
       let req = `/stock/${sym}/previous`
       // logger.log(req)
-      logger.log(sym)
+      // logger.log(sym)
       module.exports.get(req, (body) => {
-        logger.log(body)
+        // logger.log(body)
         cb(body)
         // DM.push_intra_data(body)
       })
@@ -120,8 +119,13 @@ module.exports = {
     // logger.log(list)
     if (start >= end) return
     setTimeout(() => {
+      var date = new Date()                 //more crazy code to set
+      var m = String(date.getMonth()+1)      //the correct day to 
+      m.length == 1? m = `0${m}`: m=m       //fetch data from the api
+      var d = String(date.getDate())        //to help prevent mucking the database
+      d.length == 1 ? d = `0${d}` : d = d
       let sym = list[start]
-      let req = `/stock/${sym}/chart/date/20180504`
+      let req = `/stock/${sym}/chart/date/2018${m}${d}`
       // logger.log(req)
       logger.log(sym)
       module.exports.get(req, (body) => {
