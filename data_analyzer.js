@@ -1,3 +1,9 @@
+var colors = require('colors');
+var logger = require('tracer').colorConsole({
+  format: "{{timestamp.green}} <{{title.yellow}}> {{message.cyan}} (in {{file.red}}:{{line}})",
+  dateformat: "HH:MM:ss.L"
+})
+var redis = require('./redis')
 
 module.exports = {
   // find_highs_and_lows(require('./stock_data/fb_5y.js'))

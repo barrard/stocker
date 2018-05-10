@@ -30,7 +30,8 @@ function get_chart(symbol, count, time_frame, cb) {
     console.log(Main_data[time_frame][symbol])
     cb(Main_data[time_frame][symbol].slice(count * -1))
   } else {
-    var url = `http://localhost:55555/stock/${symbol}/${time_frame}`
+    // var url = `http://localhost:55555/stock/${symbol}/${time_frame}`
+    var url = `/stocker/stock/${symbol}/${time_frame}`
 
     $.get(url, (resp) => {
       console.log(resp)

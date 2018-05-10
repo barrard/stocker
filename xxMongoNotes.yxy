@@ -3,3 +3,6 @@ db.stocks.update({}, {$pull:{minutely_data:{date:"2018-05-04"}}}, {multi:true})
 
 mongodump --db stocker_mongoose --out ./stocker_dump
 
+//resporeing on pi
+pi@daves_pi ~/go/mongo-tools/bin
+./mongoresore --db stocker_mongoose /media/usb/stocker_dump/stocker_mongoose
