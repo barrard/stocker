@@ -19,7 +19,7 @@ module.exports = (app)=>{
     const type = req.params.type
 
     redis.get(JSON.stringify({ symbol, type,}), (e, r)=>{
-      logger.log(e)
+      if(e)logger.log(e)
       // logger.log(r)
 
 

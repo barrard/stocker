@@ -2,8 +2,9 @@ var Main_data = {
   historical: {},
   minutely_data: {},
   canvas_data:[
-    { candle_width      :3,
-      space_between_bars:1
+    { candle_width      :1,
+      space_between_bars:0,
+      x_offset:0
       }
   ]
 } 
@@ -15,6 +16,7 @@ get_chart("SNAP", 3000, "historical", (data)=>{
     var canvas = document.getElementById('myCanvas');
     var context = canvas.getContext('2d');
     results.pivot_array.forEach(element => {
+      console.log(element)
 
       
     });

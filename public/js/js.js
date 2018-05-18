@@ -37,6 +37,8 @@ context.strokeStyle = 'black';
 
 
 var candle_stick_width_range_input = document.getElementById('candle_stick_width_range_input');
+var candle_stick_space_between = document.getElementById('candle_stick_space_between');
+
 var candle_stick_width_range_input_value = document.getElementById('candle_stick_width_range_input_value')
 
 candle_stick_width_range_input_value.innerText = candle_stick_width_range_input.value
@@ -47,6 +49,13 @@ hidden_span.style.visibility = "hidden"
 hidden_span.style.color = "red"
 candle_stick_width_range_input_value.appendChild(hidden_span)
 
+candle_stick_space_between.addEventListener('input', ()=>{
+  let value = parseInt(candle_stick_space_between.value)
+  candle_stick_space_between_value.innerText = value
+  Main_data.canvas_data[0].space_between_bars = value
+  get_chart_btn.click()
+
+})
                                                                                 //Candle stick slider event handler
 candle_stick_width_range_input.addEventListener('input', () => {
   var value = parseInt(candle_stick_width_range_input.value)
@@ -69,10 +78,11 @@ function draw_chart(min_max, data, canvas, candle_width, space_between_bars) {
   context.clearRect(0, 0, canvas.width, canvas.height);
   // context.lineWidth = 3;
   // context.strokeStyle = 'black';
-  console.log({ min_max })
-  canvas.width = data.length * candle_width + (space_between_bars*data.length)
+  // console.log({ min_max })
+  // canvas.width = data.length * candle_width + (space_between_bars*data.length)
 
-  console.log(`Candle_width arg = ${candle_width}`)
+  // console.log(`Candle_width arg = ${candle_width}`)
+  // console.log(`space betweeen candle = ${space_between_bars}`)
   // if (!canvas_height_manual_setting) canvas.height = (min_max.max - min_max.min) * 10
   if (!candle_width){
     candle_width = canvas.width/data.length
@@ -82,10 +92,19 @@ function draw_chart(min_max, data, canvas, candle_width, space_between_bars) {
     space_between_bars=0
   }
 
+  //add vertival time markers, every 10%?
+  //lazy 20%
+  let date_marker_position = data.length / 5
+  console.log(date_marker_position)
+  console.log(data.length % date_marker_position)
 
+console.log(data.length)
   console.log(`Candle width = ${candle_width}`)
   data.forEach((data, count)=>{
-    const candle_position = (count * candle_width) + space_between_bars
+    const candle_position = (count * candle_width) + (space_between_bars * count)
+
+    if (count % date_marker_position == 0) Canvas_Markers.draw_date_marker(candle_position, candle_width, data, canvas)
+    
     draw_candle(candle_position, min_max, data, candle_width)
   })  
 }
@@ -118,7 +137,7 @@ const total_range_in_pennies = canvas.height*pennies_per_pixel
   }else if(candle_data.open == candle_data.close){
     // console.log('black')
     context.fillStyle = 'black';
-    candle_height = 10
+    candle_height = 1
 
   }else{
     // console.log('green')

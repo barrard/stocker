@@ -15,38 +15,41 @@ var file_handling = require('./file_handling.js')
 var redis = require('./redis')
 var chart_algo = require('./data_analyzer')
 
+//    DATA_ANAYSIS TESTS
+// const symbol = "SNAP"
+// // const symbol = String(req.params.symbol).toUpperCase()
+// // const type = req.params.type
+// const type = "historical"
 
-const symbol = "SNAP"
-// const symbol = String(req.params.symbol).toUpperCase()
-// const type = req.params.type
-const type = "historical"
-
-redis.get(JSON.stringify({ symbol, type, }), (e, r) => {  logger.log(e)
-  // logger.log(r)
-
-
-  if (!r) {
-    logger.log('not in redis, look in databse')
-    Stock_model.find({ name: symbol }, { [type]: 1 }, (err, resp) => {
-      // logger.log(err)
-      // logger.log(resp)
-      redis.set(JSON.stringify({ symbol, type }), JSON.stringify(resp))
-      // chart_algo.find_highs_and_lows({ symbol, type, resp })
-      logger.log({ symbol, type, resp })
+// redis.get(JSON.stringify({ symbol, type, }), (e, r) => {  logger.log(e)
+//   // logger.log(r)
 
 
-    })
-      .sort({ 'date': 1 })
-      .find(() => { logger.log(`Found symbol - ${symbol}, type: ${type}`) })
-  } else if (r) {
-    logger.log('found in redis!!')
+//   if (!r) {
+//     logger.log('not in redis, look in databse')
+//     Stock_model.find({ name: symbol }, { [type]: 1 }, (err, resp) => {
+//       // logger.log(err)
+//       // logger.log(resp)
+//       redis.set(JSON.stringify({ symbol, type }), JSON.stringify(resp))
+//       // chart_algo.find_highs_and_lows({ symbol, type, resp })
+//       logger.log({ symbol, type, resp })
 
-    var resp = JSON.parse(r)
-    // logger.log({ symbol, type, resp })
-    logger.log(resp[0].historical)
-    chart_algo.find_highs_and_lows(resp[0].historical)
-  }
-})
+
+//     })
+//       .sort({ 'date': 1 })
+//       .find(() => { logger.log(`Found symbol - ${symbol}, type: ${type}`) })
+//   } else if (r) {
+//     logger.log('found in redis!!')
+
+//     var resp = JSON.parse(r)
+//     // logger.log({ symbol, type, resp })
+//     // logger.log(resp[0].historical)
+//     chart_algo.find_highs_and_lows(resp[0].historical)
+//   }
+// })
+
+//    DATA_ANAYSIS TESTS
+
 
 // Stock_model.find({name:"SNAP"}, {'historical':1}, (err, snap_data)=>{
 //   logger.log(snap_data)

@@ -109,7 +109,7 @@ module.exports = {
 
       module.exports.get_previous_daily(list, ++start, end, cb)
 
-    }, 200);//timer miliseconds
+    }, 50);//timer miliseconds
 
   },
 

@@ -2,10 +2,13 @@
 <html lang="en">
 
 <head>
-  <link rel="stylesheet" href="/stocker/css/css.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link rel="stylesheet" href="https://unpkg.com/toaster-js/default.css" >
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+  <link rel="stylesheet" href="/stocker/css/css.css">
+
   <title>Stocker</title>
 </head>
 
@@ -22,26 +25,37 @@
 </div> -->
 
 
-  <div class="canvas-wrapper">
+    <canvas id="myCanvas" width="" height="300"></canvas>
+
+  <!-- <div class="canvas-wrapper">
     <canvas id="myCanvas"width="1000" height="300"></canvas>
 
-  </div>
+  </div> -->
   <br>
   <hr> Candle Stick width(px)
-  <div style="display:inline" id="candle_stick_width_range_input_value"></div style="display:inline">
-  <input max="20" min="3" step="1" value='3' type="range" id='candle_stick_width_range_input'>
+  <div style="display:inline" id="candle_stick_width_range_input_value">3</div>
+  <input max="20" min="1" step="1" value='1' type="range" id='candle_stick_width_range_input'>
+  <br> Space between candlesticks
+    <div style="display:inline" id="candle_stick_space_between_value">0</div>
+
+  <input max="9" min="0" step="1" value='0' type="range" id='candle_stick_space_between'>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
   <!-- <script src="/stocker/js/libs/MindFusion/MindFusion.Common.js"></script>
     <script src="/stocker/js/libs/MindFusion/MindFusion.Gauges.js"></script>
   <script src="/stocker/js/libs/MindFusion/MindFusion.Charting.js"></script> -->
     <script src="/stocker/js/requesting_data.js"></script>
+  <script src="/stocker/js/canvas_markers.js"></script>
 
   <script src="/stocker/js/data.js"></script>
   <script src="/stocker/js/UI.js"></script>
 
   <script src="/stocker/js/js.js"></script>
   <script src="/stocker/js/client_data_analyzer.js"></script>
+  <script src="/stocker/js/animations.js"></script>
+  <script type="text/javascript" src="https://unpkg.com/toaster-js/umd.js"></script>
+
+
 
 </body>
 
