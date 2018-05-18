@@ -3,7 +3,7 @@ var get_chart_btn = document.getElementById('get_chart_btn')
 
 // draw_chart(high, data, canvas
 get_chart_btn.addEventListener('click', (e)=>{
-  console.log(e)
+  // console.log(e)
   var radios = document.getElementsByName('time-frame');
 
   for (var i = 0, length = radios.length; i < length; i++) {
