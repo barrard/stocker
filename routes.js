@@ -42,7 +42,7 @@ module.exports = (app)=>{
             data_fetch.get_5y_historical_data(symbol, (data)=>{
               if(data.e)res.send({err:data.e})
               logger.log(data.length)
-              logger.log(data)
+              // logger.log(data)
             })
 
           }else{
