@@ -47,6 +47,7 @@ function get_chart(symbol, count, time_frame, cb) {
           Main_data[time_frame][symbol] = []
           cb([])
         } else {
+          console.log(resp)
           var data = resp.resp[0][time_frame]
           Main_data[time_frame][symbol] = data
           cb(Main_data[time_frame][symbol].slice(count * -1))
