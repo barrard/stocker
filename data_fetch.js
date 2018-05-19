@@ -33,7 +33,7 @@ module.exports = {
       try {
         if(!body.length)callback([])
         const time_frame = "historical"
-        const data = {...JSON.parse(body), time_frame}
+        const data = {resp:JSON.parse(body), time_frame:time_frame}
         logger.log(data)
 
         callback(data)
