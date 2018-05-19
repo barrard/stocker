@@ -28,12 +28,8 @@ module.exports = (app)=>{
     }
 
     redis.get(JSON.stringify({ symbol, type,}), (e, r)=>{
-      if (e) {
-        logger.log(e); 
-        res.send('err')
-      }
 
-      if(!r){
+      if(!r || e){
         logger.log('not in redis, look in databse')
         Stock_model.find({ name: symbol }, { [type]: 1 }, (err, resp) => {
           // logger.log(err)
