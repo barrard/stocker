@@ -32,8 +32,8 @@ module.exports = (app)=>{
       if(!r || e){
         logger.log('not in redis, look in databse')
         Stock_model.find({ name: symbol }, { [type]: 1 }, (err, resp) => {
-          // logger.log(err)
-          // logger.log(resp)
+          logger.log(err)
+          logger.log(resp)
           if(!resp.length){
             data_fetch.get_5y_historical_data(symbol, (data)=>{
               if(data.e)res.send({err:data.e})
