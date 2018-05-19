@@ -8,6 +8,22 @@ canvas{
   /* width:500px;  */
 }
 
+#crosshair_overlay{
+  position: relative;
+  top: -306px;
+  pointer-events:none;
+}
+
+#volume_canvas_overlay{
+  position: relative;
+  top: -407;
+}
+
+#volume_canvas{
+  position: relative;
+  top: -311px;
+}
+
 .canvas-wrapper{
   width: 90%;
   overflow-x: scroll;

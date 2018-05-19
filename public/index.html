@@ -20,40 +20,81 @@
   <input type="radio" name="time-frame" value="historical">
   <!-- <input type="radio" name="time-frame" id="minute"> -->
   <button id="get_chart_btn">Get Chart</button>
+    <br>
+    <hr>
+  <div>
+    <div style="display:inline">
+           Candle Stick width(px)
+          <div style="display:inline" id="candle_stick_width_range_input_value">3</div>
+          <input max="20" min="1" step="1" value='1' type="range" id='candle_stick_width_range_input'>
+          <br> Space between candlesticks
+          <div style="display:inline" id="candle_stick_space_between_value">0</div>
+          
+          <input max="9" min="0" step="1" value='0' type="range" id='candle_stick_space_between'>
+
+    </div>
+    <div style="display:flex">
+        <div style="display:inline">
+          <input type="checkbox" id="20MA" name="MA" value="20MA">
+          <label for="20MA">20 MA</label>
+        </div>
+        <div style="display:inline">
+          <input type="checkbox" id="50MA" name="MA" value="50MA">
+          <label for="50MA">50 MA</label>
+        </div>
+        <div style="display:inline">
+          <input type="checkbox" id="200MA" name="MA" value="200MA">
+          <label for="200MA">200 MA</label>
+        </div>
+      <select multiple name="study_line" id="study_line">
+        <option  value="VWAP">VWAP</option>
+        <option  value="changePercent">changePercent</option>
+        <option value="changeOverTime">changeOverTime</option>
+        <option value="numberOfTrades">numberOfTrades</option>
+        <option value="changeOverTime">changeOverTime</option>
+        <option value="average">average</option>
+        <option value="marketChangeOverTime">marketChangeOverTime</option>
+        <option value="marketNotional">marketNotional</option>
+        <option value="marketVolume">marketVolume</option>
+        <option value="notional">notional</option>
+        <option value="numberOfTrades">numberOfTrades</option>
+        <option value="marketNumberOfTrades">marketNumberOfTrades</option>
+      </select>
+
+
+    </div>
+  </div>
 <!-- <div id="MindFusionChart">
   <canvas id="MindFusionCanvas" height="800px" width="1000"></canvas>
 </div> -->
 
 
     <canvas id="myCanvas" width="" height="300"></canvas>
+    <canvas id="crosshair_overlay" width="" height="300"></canvas>
+    <canvas id="volume_canvas" width="" height="100"></canvas>
+    <canvas id="volume_canvas_overlay" width="" height="100"></canvas>
 
   <!-- <div class="canvas-wrapper">
     <canvas id="myCanvas"width="1000" height="300"></canvas>
 
   </div> -->
-  <br>
-  <hr> Candle Stick width(px)
-  <div style="display:inline" id="candle_stick_width_range_input_value">3</div>
-  <input max="20" min="1" step="1" value='1' type="range" id='candle_stick_width_range_input'>
-  <br> Space between candlesticks
-    <div style="display:inline" id="candle_stick_space_between_value">0</div>
-
-  <input max="9" min="0" step="1" value='0' type="range" id='candle_stick_space_between'>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
   <!-- <script src="/stocker/js/libs/MindFusion/MindFusion.Common.js"></script>
     <script src="/stocker/js/libs/MindFusion/MindFusion.Gauges.js"></script>
   <script src="/stocker/js/libs/MindFusion/MindFusion.Charting.js"></script> -->
+  
     <script src="/stocker/js/requesting_data.js"></script>
-  <script src="/stocker/js/canvas_markers.js"></script>
+      <script src="/stocker/js/data.js"></script>
 
-  <script src="/stocker/js/data.js"></script>
+
   <script src="/stocker/js/UI.js"></script>
+  <script src="/stocker/js/canvas_markers.js"></script>
 
   <script src="/stocker/js/js.js"></script>
   <script src="/stocker/js/client_data_analyzer.js"></script>
-  <script src="/stocker/js/animations.js"></script>
   <script type="text/javascript" src="https://unpkg.com/toaster-js/umd.js"></script>
+  <script src="/stocker/js/animations.js"></script>
 
 
 

@@ -25,3 +25,12 @@ function handle_animation(element, animation) {
   }
 
 }
+// Toast.TYPE_INFO
+// Toast.TYPE_MESSAGE
+// Toast.TYPE_WARNING
+// Toast.TYPE_ERROR
+// Toast.TYPE_DONE
+function toast(msg, type){
+  var type = String(type).toUpperCase()
+  new Toast(msg,  Toast[`TYPE_${type}`], Toast.TIME_NORMAL);
+}

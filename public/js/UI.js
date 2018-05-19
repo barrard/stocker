@@ -12,12 +12,23 @@ get_chart_btn.addEventListener('click', (e)=>{
     if(i == radios.length-1){
       console.log('NOTHING SELECTED')
       handle_animation(radios, 'shake')
+      toast('Please select a time frame', 'error')
+      return
 
     }
   }
   var symbol = document.getElementById('symbol_input').value
   var count = document.getElementById('number_input').value
   get_chart(symbol, count, time_frame, (data) => {
+    // toast(`done searching for  ${symbol}`, 'info')
+    Canvas_Markers.stop_spinner();
+    if(!data || !data.length){
+      toast(`No data found for ${symbol}`, 'error')
+      return
+    }
+    // toast(`Data found for ${symbol}`, 'done')
+
+    Main_data.canvas_data[0].data_loaded = true
     var candle_width = Main_data.canvas_data[0].candle_width
     var space_between_bars = Main_data.canvas_data[0].space_between_bars
     //need to find visible range
@@ -47,8 +58,10 @@ get_chart_btn.addEventListener('click', (e)=>{
     // console.log(new_data)
     if (new_data){
       var max_min = ()=>{
-        var max = 0       //low number that is lower than any high
-        var min = 10000000 //some big number that is larger than any lows
+        var max = 0                   //low number that is lower than any high
+        var min = 10000000            //some big number that is larger than any lows
+        // var vol_min = 9999999999999999//low number that is lower than any high
+        var vol_max = 0               //some big number that is larger than any lows
         new_data.forEach(data_point => {
           if (data_point.high > max) {
             max = data_point.high
@@ -56,9 +69,15 @@ get_chart_btn.addEventListener('click', (e)=>{
           if (data_point.low < min && data_point.low > 0) {
             min = data_point.low
           }
+          if (data_point.volume > vol_max) {
+            vol_max = data_point.volume
+          }
+          // if (data_point.volume < vol_min && data_point.volume > 0) {
+          //   vol_min = data_point.volume
+          // }
 
         });
-        return {max, min}
+        return {max, min, vol_max}
       }
 
       draw_chart(max_min(), new_data, canvas, candle_width, space_between_bars)
@@ -95,10 +114,54 @@ function change_x_offset(e) {
 }
 
 window.addEventListener('load', ()=>{
+  const width = window.innerWidth
+
   var canvas = document.getElementById('myCanvas');
+  var crosshair_overlay = document.getElementById('crosshair_overlay');
+  var volume_canvas = document.getElementById('volume_canvas');
+  var volume_canvas_overlay = document.getElementById('volume_canvas_overlay')
+  volume_canvas_overlay.style.top="-417px"//strange bug the CSS declaration wont work, so JS is needed
+  canvas.width = width
+  crosshair_overlay.width = width
+  volume_canvas.width = width
+  volume_canvas_overlay.width = width
   Main_data.canvas_data[0].canvas = canvas
-  var context = canvas.getContext('2d');
-  canvas.width = window.innerWidth
+  Main_data.canvas_data[0].crosshair_overlay = crosshair_overlay
+  Main_data.canvas_data[0].volume_canvas = volume_canvas
+  Main_data.canvas_data[0].volume_canvas_overlay = volume_canvas_overlay
+  document.getElementById('study_line').addEventListener('mousedown', (e)=>{
+    console.log(e)
+    // e.preventDefault()
+    console.log(e.target)
+    var el = e.target
+    // console.log(e.target.parentElement)
+    // e.target.parentElement.focus()
+    e.preventDefault();
+    let val = el.value
+    Canvas_Markers.add_study_line(val)
+    // toggle selection
+    if (el.hasAttribute('selected')) el.removeAttribute('selected');
+    else el.setAttribute('selected', '');
+    var originalScrollTop = el.parentElement.scrollTop;
+
+    setTimeout(function () {
+      el.parentElement.scrollTop = originalScrollTop;
+    }, 0);
+    // var select = el.parentNode.cloneNode(true);
+    // el.parentNode.parentNode.replaceChild(select, el.parentNode);
+  })
+  
+  // var context = canvas.getContext('2d');
+  canvas.addEventListener('mousemove', (e)=>{
+    if(Main_data.canvas_data[0].data_loaded){
+      console.log('crowsshar')
+      let x = (e.layerX)
+      let y = (e.layerY)
+      Canvas_Markers.draw_crosshair(x, y)
+
+    }
+  })
+
   console.log(window.innerWidth)
   console.log(window.innerHeight)
   var x_offset = Main_data.canvas_data[0].x_offset = 0;
@@ -115,9 +178,20 @@ window.addEventListener('load', ()=>{
 })
 })
 
-window.addEventListener("resize", ()=>{
+window.addEventListener("resize", resize_all_canvas)
+
+var canvas_array = ['crosshair_overlay', 'volume_canvas', 'myCanvas', 'volume_canvas_overlay']
+function resize_all_canvas(){
+  const width = window.innerWidth
+  var volume_canvas_overlay = document.getElementById('volume_canvas_overlay')
+  var crosshair_overlay = document.getElementById('crosshair_overlay');
+  var volume_canvas = document.getElementById('volume_canvas');
+  crosshair_overlay.width = width
+  volume_canvas.width = width
+  volume_canvas_overlay.width = width
   var canvas = document.getElementById('myCanvas');
-  canvas.width = window.innerWidth
+  canvas.width = width
   get_chart_btn.click()
-})
+  
+}
 

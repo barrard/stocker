@@ -23,32 +23,38 @@ var news = 'http://localhost:55555/stock/AAPL/news'
 
 const possible_time_frames = ['historical', 'minutely_data']
 function get_chart(symbol, count, time_frame, cb) {
-  
   if(possible_time_frames.indexOf(time_frame) === -1){
     cb(null)
     return
-  }
-  console.log(`get ${count} bars of ${symbol}`)
-  console.log(time_frame)
-  if (Main_data[time_frame][symbol]) {
-    // if (typeof minute_data !== 'undefined' && minute_data[symbol] != 'undefined') {
-    // console.log(Main_data[time_frame][symbol])
-    cb(Main_data[time_frame][symbol].slice(count * -1))
-  } else {
-    // var url = `http://localhost:55555/stock/${symbol}/${time_frame}`
-    var url = `/stocker/stock/${symbol}/${time_frame}`
+  }else{
+    // toast(`fetching data for ${symbol}`, 'info')
+    Canvas_Markers.spinner()
 
-    $.get(url, (resp) => {
-      console.log(resp)
-      if(!resp.resp.length){
-        cb([])
-      }else{
-        var data = resp.resp[0][time_frame]
-        Main_data[time_frame][symbol] = data
-        cb(Main_data[time_frame][symbol].slice(count * -1))
-      }
-    })
+    console.log(`get ${count} bars of ${symbol}`)
+    console.log(time_frame)
+    if (Main_data[time_frame][symbol]) {
+      // if (typeof minute_data !== 'undefined' && minute_data[symbol] != 'undefined') {
+      // console.log(Main_data[time_frame][symbol])
+      cb(Main_data[time_frame][symbol].slice(count * -1))
+    } else {
+      // var url = `http://localhost:55555/stock/${symbol}/${time_frame}`
+      var url = `/stocker/stock/${symbol}/${time_frame}`
+
+      $.get(url, (resp) => {
+        console.log(resp)
+        if (resp.err) {
+          // return
+          Main_data[time_frame][symbol] = []
+          cb([])
+        } else {
+          var data = resp.resp[0][time_frame]
+          Main_data[time_frame][symbol] = data
+          cb(Main_data[time_frame][symbol].slice(count * -1))
+        }
+      })
+    }
   }
+
 
 }
 

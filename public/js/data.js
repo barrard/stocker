@@ -4,24 +4,29 @@ var Main_data = {
   canvas_data:[
     { candle_width      :1,
       space_between_bars:0,
-      x_offset:0
+      x_offset:0,
+      data_loaded:false,
+      crosshair_overlay:'',
+      volume_canvas:'',
+      volume_canvas_overlay:''
       }
+
   ]
 } 
 
         //symbol, count, time_frame, cb
-get_chart("SNAP", 3000, "historical", (data)=>{
-  Client_data_analyzer.find_highs_and_lows(data, (results)=>{
-    console.log(results)
-    var canvas = document.getElementById('myCanvas');
-    var context = canvas.getContext('2d');
-    results.pivot_array.forEach(element => {
-      console.log(element)
+// get_chart("SNAP", 3000, "historical", (data)=>{
+//   Client_data_analyzer.find_highs_and_lows(data, (results)=>{
+//     console.log(results)
+//     var canvas = document.getElementById('myCanvas');
+//     var context = canvas.getContext('2d');
+//     results.pivot_array.forEach(element => {
+//       console.log(element)
 
       
-    });
-  })
-}) 
+//     });
+//   })
+// }) 
 
 function draw_high_low(candle_position, min_max, candle_data, candle_width) {
   var number_of_pennies = (min_max.max - min_max.min) * 100

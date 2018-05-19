@@ -4,6 +4,7 @@ var logger = require('tracer').colorConsole({
   dateformat: "HH:MM:ss.L"
 })
 const Stock_model = require('./stock_model.js')
+const data_fetch = require('./data_fetch.js')
 var redis = require('./redis')
 
 module.exports = (app)=>{
@@ -12,24 +13,43 @@ module.exports = (app)=>{
   //  / minute
   //  / intra
   //  / news
+  const possible_time_frames = ['historical', 'minutely_data']
+
 
   app.get('/stock/:symbol/:type/', (req, res)=>{
     logger.log(req.params)
     const symbol = String(req.params.symbol).toUpperCase()
     const type = req.params.type
 
-    redis.get(JSON.stringify({ symbol, type,}), (e, r)=>{
-      if(e)logger.log(e)
-      // logger.log(r)
+    if (possible_time_frames.indexOf(type) === -1) {
+      // cb(null)
+      res.send('err')
+      return
+    }
 
+    redis.get(JSON.stringify({ symbol, type,}), (e, r)=>{
+      if (e) {
+        logger.log(e); 
+        res.send('err')
+      }
 
       if(!r){
         logger.log('not in redis, look in databse')
         Stock_model.find({ name: symbol }, { [type]: 1 }, (err, resp) => {
           // logger.log(err)
           // logger.log(resp)
-          res.send({ symbol, type, resp })
-          redis.set(JSON.stringify({ symbol, type }), JSON.stringify(resp))
+          if(!resp.length){
+            data_fetch.get_5y_historical_data(symbol, (data)=>{
+              if(data.e)res.send({err:data.e})
+              logger.log(data.length)
+              logger.log(data)
+            })
+
+          }else{
+            res.send({ symbol, type, resp })
+            redis.set(JSON.stringify({ symbol, type }), JSON.stringify(resp))
+          }
+
 
         })
           .sort({ 'date': 1 })

@@ -31,6 +31,7 @@ module.exports = {
       // logger.log(body)
       if (!body) return
       try {
+        if(!body.length)callback([])
         const data = JSON.parse(body)
         // logger.log(data)
 
@@ -38,6 +39,7 @@ module.exports = {
       } catch (e) {
         logger.log('Some kind JSON error')
         logger.log(e)
+        callback({e})
       }
     })
   },

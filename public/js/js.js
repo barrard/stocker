@@ -1,5 +1,7 @@
 var canvas = document.getElementById('myCanvas');
+var volume_canvas_overlay = document.getElementById('volume_canvas_overlay');
 var context = canvas.getContext('2d');
+var vol_ctx = volume_canvas_overlay.getContext('2d')
 var canvas_height_manual_setting = false
 // canvas.width = window.innerWidth
 console.log(canvas.width)
@@ -8,6 +10,8 @@ console.log(canvas.height)
 // context.rect(188, 50, 200, 100);
 // context.fillStyle = 'yellow';
 // context.fill();
+vol_ctx.lineWidth = 1;
+vol_ctx.strokeStyle = 'black';
 context.lineWidth = 1;
 context.strokeStyle = 'black';
 // context.stroke();
@@ -74,8 +78,10 @@ candle_stick_width_range_input.addEventListener('input', () => {
 //   console.log('dfgdfgdfgdfg')
 // })
 function draw_chart(min_max, data, canvas, candle_width, space_between_bars) {
+  Main_data.canvas_data[0].min_max = min_max
   var context = canvas.getContext('2d');
   context.clearRect(0, 0, canvas.width, canvas.height);
+  Main_data.canvas_data[0].volume_canvas.getContext('2d').clearRect(0, 0, Main_data.canvas_data[0].volume_canvas.width, Main_data.canvas_data[0].volume_canvas.height)
   // context.lineWidth = 3;
   // context.strokeStyle = 'black';
   // console.log({ min_max })
@@ -94,30 +100,37 @@ function draw_chart(min_max, data, canvas, candle_width, space_between_bars) {
 
   //add vertival time markers, every 10%?
   //lazy 20%
-  let date_marker_position = data.length / 5
+  let date_marker_position = Math.floor(data.length / 10)
   console.log(date_marker_position)
   console.log(data.length % date_marker_position)
 
 console.log(data.length)
   console.log(`Candle width = ${candle_width}`)
+const vol_canvas = Main_data.canvas_data[0].volume_canvas
+Canvas_Markers.draw_price_markers(min_max)
+Canvas_Markers.draw_studies(data)
+  var number_of_pennies = (min_max.max - min_max.min) * 100
+  // var pennies_per_pixel = (number_of_pennies / canvas.height)
+  var pixels_per_penny = (canvas.height / number_of_pennies)
+  // var vol_range = (min_max.max - min_max.min) * 100
+  // var pennies_per_pixel = (number_of_pennies / canvas.height)
+  var pixels_per_vol = (vol_canvas.height / min_max.vol_max)
   data.forEach((data, count)=>{
     const candle_position = (count * candle_width) + (space_between_bars * count)
 
     if (count % date_marker_position == 0) Canvas_Markers.draw_date_marker(candle_position, candle_width, data, canvas)
     
-    draw_candle(candle_position, min_max, data, candle_width)
+    draw_candle(candle_position, min_max, data, candle_width, pixels_per_penny, pixels_per_vol)
   })  
 }
 
 // draw_candle(1, 100, 0, {low:0, high:80, open:75, close:80})
-function draw_candle(candle_position, min_max, candle_data, candle_width){
-  var number_of_pennies = (min_max.max - min_max.min) * 100
-  var pennies_per_pixel = (number_of_pennies / canvas.height)
-  var pixels_per_penny = (canvas.height / number_of_pennies)
+function draw_candle(candle_position, min_max, candle_data, candle_width, pixels_per_penny, pixels_per_vol){
+
   // console.log({ pennies_per_pixel })
   // console.log({ pixels_per_penny })
 
-const total_range_in_pennies = canvas.height*pennies_per_pixel
+// const total_range_in_pennies = canvas.height*pennies_per_pixel
 // console.log({total_range_in_pennies})
   // console.log({ candle_data})
   // console.log((min_max.max - candle_data.high) * 100 * pixels_per_penny)
@@ -144,7 +157,9 @@ const total_range_in_pennies = canvas.height*pennies_per_pixel
     context.fillStyle = 'green';
     candle_height = (candle_data.close - candle_data.open)*100*pixels_per_penny
   }
-  context.fillRect((candle_position + (candle_width / 2)) - (candle_width / 2), (min_max.max - candle_data.open) * 100 * pixels_per_penny,
+  Canvas_Markers.draw_volume(candle_position, min_max, candle_data, candle_width, context.fillStyle, pixels_per_vol)
+
+  context.fillRect(candle_position , (min_max.max - candle_data.open) * 100 * pixels_per_penny,
                     candle_width, candle_height)
   //open line 
   // context.moveTo((candle_position + (candle_width/2))-(candle_width/2), high - candle_data.open);
