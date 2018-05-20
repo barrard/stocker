@@ -6,10 +6,10 @@ var logger = require('tracer').colorConsole({
 // var MongoClient = require('mongodb').MongoClient
 // var mongodb = require('mongodb')
 // var url = 'mongodb://localhost:27017';
-var database_name = "stocker_mongoose"
+var database_name = "stocker_mongose"
 
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/stocker_mongoose');
+mongoose.connect('mongodb://localhost/stocker_mongose');
 var db = mongoose.connection;
 var Schema = mongoose.Schema;
 

@@ -38,6 +38,8 @@ module.exports = (app)=>{
             data_fetch.get_5y_historical_data(symbol, (data)=>{
               if(data.e)res.send({err:data.e})
               logger.log(data.length)
+              var data = { resp: [{ [type]: data }] }
+
               res.send(data)
               // logger.log(data)
             })
