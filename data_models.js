@@ -5,15 +5,37 @@ var logger = require('tracer').colorConsole({
 })
 const fs = require('fs')
 const Stock_model = require('./stock_model.js')
+const Daily_Watchlist_Model = require('./models/daily_watch_list_model.js')
 // const serv = require('./server.js')
-const data_fetch = require('./data_fetch')
+var data_fetch = require('./data_fetch.js')
 const utils = require('./utils.js');
-
-const ordered_vol_list_filename = 'volume_sort.js'
+const ordered_vol_list_filename = 'volume_sort.js';
 const model_data = './model_data/';
 const main_liquid_stocks_followed = 'main_liquid_stocks_followed_test'
+var chart_algo = require('./data_analyzer')
 
 module.exports = {
+  run_MA_test: (count, MAs, time_frame, variable_compare_value_low, variable_compare_value_high)=>{
+    // Stock_model.update({ name: data.symbol }
+    logger.log(`run MA test`)
+    logger.log({ count, MAs, time_frame, variable_compare_value_low, variable_compare_value_high})
+    chart_algo.find_stocks_near_MA(count, MAs, time_frame, variable_compare_value_low, variable_compare_value_high, (data)=>{
+      logger.log(data)
+      var MA = `MA${data.MA}`
+      var state = `state${data.MA}`
+      Daily_Watchlist_Model.findOneAndUpdate({ name: data.stock_name }, { 
+        name: data.stock_name,
+        [state]: data.type,//'above' or 'below' given MA
+        [MA]: data.relative_diff,//percentace from MA relative to price
+        current_price: data.last_close
+      }, { upsert: true },(e, r)=>{
+         logger.log(e)
+         logger.log(r)
+       })
+    })
+
+  },
+
   top_volume_list:(count, cb)=>{
     logger.log(`getting ticker symbols for top ${count} by volume`)
     const ordered_volume_list = require(model_data + ordered_vol_list_filename);
@@ -38,6 +60,10 @@ module.exports = {
       }
     })
   },
+  test_from_DM:()=>{
+    data_fetch.get_test_fetch()
+
+  },
     //Main function for keeping historical data up to date
   add_daily_data: (count) => {
     logger.log('ADD DAILY DATA')
@@ -60,7 +86,7 @@ module.exports = {
         } else {
           logger.log('lets get differernt data')
 
-          data_fetch.get_previous_daily(['MSFT'], 0, 1, (data) => {
+          data_fetch.get_previous_daily(['INTC'], 0, 1, (data) => {
             data = JSON.parse(data)
             // logger.log(data)
 
@@ -110,7 +136,7 @@ module.exports = {
           logger.log('lets get differernt data')
           data_fetch.get_previous_minutely(['MSFT'], 0, 1, (data, symbol) => {
             data = JSON.parse(data)
-
+            logger.log(data)
             if (!utils.check_available_data_is_new(my_date, data[0].date)) {
               logger.log('WEBSITE HASNT UPDATED MINUTELY DATA YET')
             } else {

@@ -4,7 +4,6 @@ var logger = require('tracer').colorConsole({
   dateformat: "HH:MM:ss.L"
 })
 const Stock_model = require('./stock_model.js')
-const data_fetch = require('./data_fetch.js')
 var redis = require('./redis')
 
 module.exports = (app)=>{
@@ -33,8 +32,10 @@ module.exports = (app)=>{
         logger.log('not in redis, look in databse')
         Stock_model.find({ name: symbol }, { [type]: 1 }, (err, resp) => {
           logger.log(err)
-          logger.log(resp)
+          // logger.log(resp)
           if(!resp.length){
+            const data_fetch = require('./data_fetch.js')
+
             data_fetch.get_5y_historical_data(symbol, (data)=>{
               if(data.e)res.send({err:data.e})
               logger.log(data.length)

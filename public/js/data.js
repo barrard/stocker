@@ -1,6 +1,7 @@
 var Main_data = {
   historical: {},
   minutely_data: {},
+
   canvas_data:[
     { candle_width      :1,
       space_between_bars:0,
@@ -8,7 +9,9 @@ var Main_data = {
       data_loaded:false,
       crosshair_overlay:'',
       volume_canvas:'',
-      volume_canvas_overlay:''
+      volume_canvas_overlay:'',
+      MA: {},
+      symbol:''
       }
 
   ]

@@ -9,7 +9,7 @@ var logger = require('tracer').colorConsole({
 var database_name = "stocker_mongose"
 
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/stocker_mongose');
+mongoose.connect('mongodb://localhost/stocker_mongoose');
 var db = mongoose.connection;
 var Schema = mongoose.Schema;
 

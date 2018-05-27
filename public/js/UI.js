@@ -26,6 +26,8 @@ get_chart_btn.addEventListener('click', (e)=>{
       toast(`No data found for ${symbol}`, 'error')
       return
     }
+    Canvas_Markers.check_MA_data(symbol, data)
+
     // toast(`Data found for ${symbol}`, 'done')
 
     Main_data.canvas_data[0].data_loaded = true
@@ -39,25 +41,26 @@ get_chart_btn.addEventListener('click', (e)=>{
     let total_bars_visible = Math.floor(candle_count - additional_candle_space)
     let x_offset = Main_data.canvas_data[0].x_offset/(candle_width+space_between_bars)
     let data_length = data.length
-    console.log({ candle_count, width, additional_candle_space, total_bars_visible, data_length, x_offset})
-  var new_data
+  let new_data
     if (x_offset == 0 ){
        new_data = data.slice(candle_count * -1)
 
     } else {
 
-      let end_of_data = data_length - x_offset - candle_count
+      var end_of_data = data_length - x_offset - candle_count
       if(end_of_data < 0 ) end_of_data = 0; 
       if(x_offset + candle_count > data_length) Main_data.canvas_data[0].x_offset = x_offset = data_length - candle_count;
 
        new_data = data.slice(end_of_data, (x_offset*-1))
 
     }
+    console.log({ candle_count, width, additional_candle_space, total_bars_visible, data_length, x_offset, end_of_data })
+
     // var data = data.slice(candle_count * -1)
 
     // console.log(new_data)
-    if (new_data){
-      var max_min = ()=>{
+    // if (new_data){
+    var min_max = ()=>{
         var max = 0                   //low number that is lower than any high
         var min = 10000000            //some big number that is larger than any lows
         // var vol_min = 9999999999999999//low number that is lower than any high
@@ -79,13 +82,14 @@ get_chart_btn.addEventListener('click', (e)=>{
         });
         return {max, min, vol_max}
       }
+    Main_data.canvas_data[0].min_max = min_max()
 
-      draw_chart(max_min(), new_data, canvas, candle_width, space_between_bars)
+      draw_chart(new_data, canvas, candle_width, space_between_bars)
 
-      console.log(max_min())
+      // console.log(max_min())
       // console.log(max)
       // console.log(min)
-    }
+    // }
 
   })
 
@@ -114,7 +118,7 @@ function change_x_offset(e) {
 }
 
 window.addEventListener('load', ()=>{
-  const width = window.innerWidth
+  const width = window.innerWidth * .95
 
   var canvas = document.getElementById('myCanvas');
   var crosshair_overlay = document.getElementById('crosshair_overlay');
@@ -129,34 +133,42 @@ window.addEventListener('load', ()=>{
   Main_data.canvas_data[0].crosshair_overlay = crosshair_overlay
   Main_data.canvas_data[0].volume_canvas = volume_canvas
   Main_data.canvas_data[0].volume_canvas_overlay = volume_canvas_overlay
-  document.getElementById('study_line').addEventListener('mousedown', (e)=>{
-    console.log(e)
-    // e.preventDefault()
-    console.log(e.target)
-    var el = e.target
-    // console.log(e.target.parentElement)
-    // e.target.parentElement.focus()
-    e.preventDefault();
-    let val = el.value
-    Canvas_Markers.add_study_line(val)
-    // toggle selection
-    if (el.hasAttribute('selected')) el.removeAttribute('selected');
-    else el.setAttribute('selected', '');
-    var originalScrollTop = el.parentElement.scrollTop;
+  document.querySelectorAll('input[name="MA"]').forEach((check_box)=>{
+    check_box.addEventListener('change', (e)=>{
+      if(Main_data.canvas_data[0].data_loaded)get_chart_btn.click()
 
-    setTimeout(function () {
-      el.parentElement.scrollTop = originalScrollTop;
-    }, 0);
-    // var select = el.parentNode.cloneNode(true);
-    // el.parentNode.parentNode.replaceChild(select, el.parentNode);
+
+    })
   })
+  // document.getElementById('study_line').addEventListener('mousedown', (e)=>{
+  //   console.log(e)
+  //   // e.preventDefault()
+  //   console.log(e.target)
+  //   var el = e.target
+  //   // console.log(e.target.parentElement)
+  //   // e.target.parentElement.focus()
+  //   e.preventDefault();
+  //   let val = el.value
+  //   Canvas_Markers.add_study_line(val)
+  //   // toggle selection
+  //   if (el.hasAttribute('selected')) el.removeAttribute('selected');
+  //   else el.setAttribute('selected', '');
+  //   var originalScrollTop = el.parentElement.scrollTop;
+
+  //   setTimeout(function () {
+  //     el.parentElement.scrollTop = originalScrollTop;
+  //   }, 0);
+  //   // var select = el.parentNode.cloneNode(true);
+  //   // el.parentNode.parentNode.replaceChild(select, el.parentNode);
+  // })
   
   // var context = canvas.getContext('2d');
-  canvas.addEventListener('mousemove', (e)=>{
-    if(Main_data.canvas_data[0].data_loaded){
+  canvas.addEventListener('mousemove', (e) => {
+    if (Main_data.canvas_data[0].data_loaded) {
       console.log('crowsshar')
       let x = (e.layerX)
       let y = (e.layerY)
+      // console.log({ x, y })
       Canvas_Markers.draw_crosshair(x, y)
 
     }
@@ -182,7 +194,7 @@ window.addEventListener("resize", resize_all_canvas)
 
 var canvas_array = ['crosshair_overlay', 'volume_canvas', 'myCanvas', 'volume_canvas_overlay']
 function resize_all_canvas(){
-  const width = window.innerWidth
+  const width = window.innerWidth * .95
   var volume_canvas_overlay = document.getElementById('volume_canvas_overlay')
   var crosshair_overlay = document.getElementById('crosshair_overlay');
   var volume_canvas = document.getElementById('volume_canvas');

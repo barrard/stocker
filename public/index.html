@@ -16,7 +16,7 @@
   symbol:
   <input id="symbol_input" type="text" value="SNAP"> number of bars:
   <input id="number_input" type="number" value="3000"> minutely data
-  <input type="radio" name="time-frame" value="minutely_data"> historical data
+  <input type="radio" name="time-frame" checked value="minutely_data"> historical data
   <input type="radio" name="time-frame" value="historical">
   <!-- <input type="radio" name="time-frame" id="minute"> -->
   <button id="get_chart_btn">Get Chart</button>
@@ -35,19 +35,19 @@
     </div>
     <div style="display:flex">
         <div style="display:inline">
-          <input type="checkbox" id="20MA" name="MA" value="20MA">
+          <input type="checkbox" id="20MA" checked name="MA" value="20">
           <label for="20MA">20 MA</label>
         </div>
         <div style="display:inline">
-          <input type="checkbox" id="50MA" name="MA" value="50MA">
+          <input type="checkbox"  id="50MA" name="MA" value="50">
           <label for="50MA">50 MA</label>
         </div>
         <div style="display:inline">
-          <input type="checkbox" id="200MA" name="MA" value="200MA">
+          <input type="checkbox" id="200MA" name="MA" value="200">
           <label for="200MA">200 MA</label>
         </div>
       <select multiple name="study_line" id="study_line">
-        <option  value="VWAP">VWAP</option>
+        <option  value="vwap">VWAP</option>
         <option  value="changePercent">changePercent</option>
         <option value="changeOverTime">changeOverTime</option>
         <option value="numberOfTrades">numberOfTrades</option>

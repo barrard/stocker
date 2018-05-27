@@ -77,8 +77,10 @@ candle_stick_width_range_input.addEventListener('input', () => {
 // candle_stick_width_range_input.addEventListener('onchange', () => {
 //   console.log('dfgdfgdfgdfg')
 // })
-function draw_chart(min_max, data, canvas, candle_width, space_between_bars) {
-  Main_data.canvas_data[0].min_max = min_max
+function draw_chart(data, canvas, candle_width, space_between_bars) {
+  var min_max = Main_data.canvas_data[0].min_max
+  console.log(min_max)
+
   var context = canvas.getContext('2d');
   context.clearRect(0, 0, canvas.width, canvas.height);
   Main_data.canvas_data[0].volume_canvas.getContext('2d').clearRect(0, 0, Main_data.canvas_data[0].volume_canvas.width, Main_data.canvas_data[0].volume_canvas.height)
@@ -107,25 +109,35 @@ function draw_chart(min_max, data, canvas, candle_width, space_between_bars) {
 console.log(data.length)
   console.log(`Candle width = ${candle_width}`)
 const vol_canvas = Main_data.canvas_data[0].volume_canvas
-Canvas_Markers.draw_price_markers(min_max)
-Canvas_Markers.draw_studies(data)
+
   var number_of_pennies = (min_max.max - min_max.min) * 100
-  // var pennies_per_pixel = (number_of_pennies / canvas.height)
+  var pennies_per_pixel = (number_of_pennies / canvas.height)
   var pixels_per_penny = (canvas.height / number_of_pennies)
+  Main_data.canvas_data[0].pixels_per_penny = pixels_per_penny
+  Main_data.canvas_data[0].pennies_per_pixel = pennies_per_pixel
   // var vol_range = (min_max.max - min_max.min) * 100
-  // var pennies_per_pixel = (number_of_pennies / canvas.height)
   var pixels_per_vol = (vol_canvas.height / min_max.vol_max)
+  Canvas_Markers.draw_price_markers(min_max)
+  Canvas_Markers.draw_studies(data)
   data.forEach((data, count)=>{
     const candle_position = (count * candle_width) + (space_between_bars * count)
 
     if (count % date_marker_position == 0) Canvas_Markers.draw_date_marker(candle_position, candle_width, data, canvas)
     
-    draw_candle(candle_position, min_max, data, candle_width, pixels_per_penny, pixels_per_vol)
+    draw_candle(candle_position, data, candle_width, pixels_per_penny, pixels_per_vol)
   })  
+  document.querySelectorAll('input[name="MA"]').forEach((check_box) => {
+    if (check_box.checked) {
+      Canvas_Markers.draw_MA(check_box.value)
+    }
+  })
+
+
 }
 
 // draw_candle(1, 100, 0, {low:0, high:80, open:75, close:80})
-function draw_candle(candle_position, min_max, candle_data, candle_width, pixels_per_penny, pixels_per_vol){
+function draw_candle(candle_position, candle_data, candle_width, pixels_per_penny, pixels_per_vol){
+  var min_max = Main_data.canvas_data[0].min_max
 
   // console.log({ pennies_per_pixel })
   // console.log({ pixels_per_penny })
@@ -170,13 +182,4 @@ function draw_candle(candle_position, min_max, candle_data, candle_width, pixels
 
 
 }
-
-
-function get_min_max(){
-  console.log('hi')
-
-}
-
-
-
 

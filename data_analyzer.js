@@ -4,8 +4,96 @@ var logger = require('tracer').colorConsole({
   dateformat: "HH:MM:ss.L"
 })
 var redis = require('./redis')
+var volume_sorted_list = require('./model_data/volume_sort.js')
+var Stock_model = require('./stock_model.js')
+const possible_time_frames = ['historical', 'minutely_data']
 
 module.exports = {
+  get_list_of_stocks:(limit)=>{
+    var stock_list = []
+    volume_sorted_list.forEach((stock, count) => {
+      if (count < limit) {
+        stock_list.push(stock.name)
+        // logger.log(`${count} ${stock.name}`)
+      }
+    })
+    return stock_list
+
+  },
+
+  find_stocks_near_MA: (limit, MA, time_frame, variable_compare_value_low, variable_compare_value_high, cb) => {
+
+    var list = module.exports.get_list_of_stocks(limit)
+    // logger.log(list.length)
+    list.forEach((stock_name)=>{
+      // logger.log(stock_name)
+      Stock_model.find({ name: stock_name }, { [time_frame]: 1 }, (err, data) => {
+        var data = data[0][time_frame]
+
+      
+        // logger.log('is an array')
+        MA.forEach((MA) => {
+          var sliced_data = data.slice(MA * -1)
+
+          // logger.log(sliced_data.length)
+          cal_MA(MA, sliced_data, (MA_data) => {
+            var last_close = (sliced_data.slice(-1)[0].close)
+            // logger.log(`the last closeing price of ${stock_name} is ${last_close}`)
+            // logger.log(`the MA ${MA} is at ${MA_data}`)
+            var diff, type
+            if (last_close > MA_data) {
+              //stock is abouve the MA
+              diff = last_close - MA_data
+              type = 'above'
+              // logger.log(`diff is ${diff}`)
+              // logger.log(`relative divverence = ${diff/last_close * 100}`)
+
+            } else {
+              //stock is below the MA
+              diff = MA_data - last_close
+              type = 'below'
+              // logger.log(`diff is ${diff}`)
+              // logger.log(`relative divverence = ${diff / last_close * 100}`)
+
+            }
+            var relative_diff = ( diff / last_close) * 100
+            if ( (variable_compare_value_low < relative_diff) && (relative_diff < variable_compare_value_high)) {
+              logger.log(`${stock_name} is ${relative_diff} ${type} the ${MA} moving average`)
+
+              cb({last_close, stock_name,relative_diff,type,MA  })
+            }
+            // logger.log(`/////////            LINE BREAK        //////////////////`)
+          })
+        })
+
+
+
+      })
+
+    })
+
+
+  },
+
+  back_test_stocks_near_MA: (limit, MA, time_frame) => {
+    var list = module.exports.get_list_of_stocks(limit)
+    // logger.log(list.length)
+    list.forEach((stock_name)=>{
+      if(time_frame == 'historical'){
+        Stock_model.find({ name: stock_name}, {'historical':1}, (err, data)=>{
+          // logger.log(data.length)
+        })
+
+      }else if (time_frame == 'minutely'){
+        Stock_model.find({ name: stock_name }, { 'minutely': 1 }, (err, data) => {
+          // logger.log(data.length)
+
+        })
+      }
+    })
+
+
+  },
   // find_highs_and_lows(require('./stock_data/fb_5y.js'))
   find_highs_and_lows:(data)=>{
   logger.log(data.length)
@@ -92,3 +180,24 @@ module.exports = {
 }
 
 }
+
+
+
+function cal_MA(MA, data, cb) {
+  var raw_data = []
+  var MA = parseInt(MA)
+  // logger.log(data.length)
+  data.forEach((d, count) => {
+    let close = d.close
+    if (close == 0 || close == undefined) {
+      close = d.marketAverage
+    }
+    raw_data.push(close)
+  })
+  let sum = raw_data.reduce((acc, val) => {
+    return (acc + val);
+  })
+  let avg = parseFloat(sum / MA).toFixed(2)
+  cb(avg)
+  }
+

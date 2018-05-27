@@ -3,6 +3,7 @@ var logger = require('tracer').colorConsole({
   format: "{{timestamp.green}} <{{title.yellow}}> {{message.cyan}} (in {{file.red}}:{{line}})",
   dateformat: "HH:MM:ss.L"
 })
+
 const request = require('request');
 const fs = require('fs')
 
@@ -117,6 +118,9 @@ module.exports = {
     }, 50);//timer miliseconds
 
   },
+  get_test_fetch:()=>{
+    logger.log(`Stop failing`)
+  },
 
   get_previous_minutely: (list, start, end, cb) => {
     logger.log({ start, end })
@@ -129,6 +133,8 @@ module.exports = {
       m.length == 1? m = `0${m}`: m=m       //fetch data from the api
       var d = String(date.getDate())        //to help prevent mucking the database
       d.length == 1 ? d = `0${d}` : d = d
+      // logger.log(d)
+      // d=25
       let sym = list[start]
       let req = `/stock/${sym}/chart/date/2018${m}${d}`
       // logger.log(req)

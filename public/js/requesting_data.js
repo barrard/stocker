@@ -29,7 +29,10 @@ function get_chart(symbol, count, time_frame, cb) {
   }else{
     // toast(`fetching data for ${symbol}`, 'info')
     Canvas_Markers.spinner()
-
+    if (!Main_data.canvas_data[0].MA[symbol]){
+      Main_data.canvas_data[0].MA[symbol]={}
+    }
+  Main_data.canvas_data[0].symbol = symbol
     console.log(`get ${count} bars of ${symbol}`)
     console.log(time_frame)
     if (Main_data[time_frame][symbol]) {
@@ -52,6 +55,7 @@ function get_chart(symbol, count, time_frame, cb) {
           console.log(time_frame)
           var data = resp.resp[0][time_frame]
           Main_data[time_frame][symbol] = data
+
           cb(Main_data[time_frame][symbol].slice(count * -1))
         }
       })

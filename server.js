@@ -14,6 +14,9 @@ var Stock_model = require('./stock_model.js')
 var file_handling = require('./file_handling.js')
 var redis = require('./redis')
 var chart_algo = require('./data_analyzer')
+const DM = require('./data_models.js')
+const data_fetch = require('./data_fetch.js')
+require('./routes.js')(app)
 
 //    DATA_ANAYSIS TESTS
 // const symbol = "SNAP"
@@ -55,6 +58,15 @@ var chart_algo = require('./data_analyzer')
 //   logger.log(snap_data)
 //   chart_algo.find_highs_and_lows(snap_data)
 // })
+//   number of stocks,  possible array of MAs  timeframe ('historical' or 'minutely'), percent_relative
+// DM.run_MA_test(10, [20], 'minutely_data', 1)
+
+// DM.run_MA_test(10, [20, 50, 200], 'historical', 0, 100000)
+
+// Stock_model.find({ name: "SNAP" }, (e, r)=>{
+//   console.log(e)
+//   console.log(r)
+// })
 
 
 
@@ -68,7 +80,7 @@ app.use(function (req, res, next) {
 const port = 55555;
 app.listen(port, ()=>{logger.log(`listening on ${port}`)})
 // var options = {root: __dirname}
-require('./routes.js')(app)
+
 
 const symbol_example = '?symbols=SNAP,fb'
 
@@ -83,8 +95,6 @@ const batch1 = '/stock/aapl/chart/date/20180427/chartInterval/10'
 // const batch1 = '/deep/official-price?symbols=appl'
 // data_fetch.get(batch1)
 const socket_data = 'https://ws-api.iextrading.com/1.0'
-const DM = require('./data_models.js')
-const data_fetch = require('./data_fetch.js')
 
 
 //creates full symbol list, only run once or as needed
@@ -137,7 +147,8 @@ function update_book_durring_day(count){
 
 
 
-
+// data_fetch.get_test_fetch()
+// DM.test_from_DM()
 //update historical and minutely data via the HTTP API calls
 // DM.add_daily_data(1000)//1000 is ok here   //@@ KEEP THIS A MINUTE    //files added up to 5/7
                 //TODO LATER

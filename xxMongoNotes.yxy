@@ -6,3 +6,7 @@ mongodump --db stocker_mongoose --out ./stocker_dump
 //resporeing on pi
 pi@daves_pi ~/go/mongo-tools/bin
 ./mongoresore --db stocker_mongoose /media/usb/stocker_dump/stocker_mongoose
+
+
+
+db.stocks.update({}, {$pull:{historical:{date:"2018-05-18"}}}, {multi:true})
